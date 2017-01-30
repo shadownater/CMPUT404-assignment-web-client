@@ -42,17 +42,18 @@ class HTTPClient(object):
         #Ryan mentioned client lab for this part, so I used my previous lab for this
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-
+        print 'made a socket...'
         # AF_INET means we want an IPv4 socket
         # SOCK_STREAM means we want a TCP socket
-        port = 8080 #for now?
+        port = 80 #for now? Note to self, 8080 is not TCP
         clientSocket.connect( (host, port) ) #address, port
-
+        print 'connected, returning connection...'
         return clientSocket
 
 #---Section below are for processing the response I think -------------------------------------------------------------
 
     def get_code(self, data):
+        print data
         return None
 
     def get_headers(self,data):
@@ -75,17 +76,36 @@ class HTTPClient(object):
 
 #---End of processing response section --------------------------------------------------------------------------------
 
+    def plainifyURL(self, url):
+        #remove all the junk after a slash, return the main url
+        #may not work if no http:// - possible?
+        plainURL = url.split('/')
+        print 'plain url = ' + plainURL[2]
+        return plainURL[2]
+
+
     def GET(self, url, args=None):
         #build the request to send to the url
+
+        #host needs to be plainer! like www.tutorialspoint.com ONLY
+
+        newURL = self.plainifyURL(url)
+
         header=''
         header += 'GET ' + url + ' HTTP/1.1\r\n'
         header +='\r\n'
         
         #do this when youre ready
-        #clientSocket.sendall(header)
-        #clientSocket.recvall(clientSocket)
+        print 'connecting...'
+        theClient = self.connect(newURL, 80) #hardcoded for now? Does it change?
 
+        print 'Connected. sending header'
+        theClient.sendall(header)
+        print 'Sent header. Getting response...'
+        response = self.recvall(theClient)
+        print 'Got response'
         code = 500
+        self.get_code(response)
         body = ""
 
         return HTTPResponse(code, body)
@@ -94,11 +114,12 @@ class HTTPClient(object):
         #build the request to send to the url
         #POST, so use urllib.urlencode() here!
 
-        code = 500
-        body = ""
-
         #do this when youre ready
         #clientSocket.sendall(header)
+        #self.recvall(clientSocket)
+
+        code = 500
+        body = ""
 
         return HTTPResponse(code, body)
 
