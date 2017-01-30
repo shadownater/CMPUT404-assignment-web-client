@@ -35,9 +35,22 @@ class HTTPResponse(object):
 class HTTPClient(object):
     #def get_host_port(self,url):
 
+    
+
     def connect(self, host, port):
-        # use sockets!
-        return None
+        # use sockets! -me: ok
+        #Ryan mentioned client lab for this part, so I used my previous lab for this
+
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+
+        # AF_INET means we want an IPv4 socket
+        # SOCK_STREAM means we want a TCP socket
+        port = 8080 #for now?
+        clientSocket.connect( (host, port) ) #address, port
+
+        return clientSocket
+
+#---Section below are for processing the response I think -------------------------------------------------------------
 
     def get_code(self, data):
         return None
@@ -60,14 +73,33 @@ class HTTPClient(object):
                 done = not part
         return str(buffer)
 
+#---End of processing response section --------------------------------------------------------------------------------
+
     def GET(self, url, args=None):
+        #build the request to send to the url
+        header=''
+        header += 'GET ' + url + ' HTTP/1.1\r\n'
+        header +='\r\n'
+        
+        #do this when youre ready
+        #clientSocket.sendall(header)
+        #clientSocket.recvall(clientSocket)
+
         code = 500
         body = ""
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
+        #build the request to send to the url
+        #POST, so use urllib.urlencode() here!
+
         code = 500
         body = ""
+
+        #do this when youre ready
+        #clientSocket.sendall(header)
+
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
