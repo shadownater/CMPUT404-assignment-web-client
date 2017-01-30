@@ -88,18 +88,28 @@ class HTTPClient(object):
         #build the request to send to the url
 
         #host needs to be plainer! like www.tutorialspoint.com ONLY
-
         newURL = self.plainifyURL(url)
 
+        #need the bit after the above
+        toFetch = '/' #for now
+
+        #Helpful information about building a request header from:
+        #https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+
         header=''
-        header += 'GET ' + url + ' HTTP/1.1\r\n'
+        header += 'GET ' + toFetch + ' HTTP/1.1\r\n'
+        header += 'Host: ' + newURL + '\r\n'
+        header += 'Accept: ' + '*/*\r\n'
+        #header += 'Accept-Language: en-us\r\n'
+        #header += 'Accept-Encoding: *\r\n' #??
+        #header += 'Connection: Keep-Alive\r\n'
         header +='\r\n'
         
         #do this when youre ready
         print 'connecting...'
         theClient = self.connect(newURL, 80) #hardcoded for now? Does it change?
 
-        print 'Connected. sending header'
+        print 'Header is: ' + header
         theClient.sendall(header)
         print 'Sent header. Getting response...'
         response = self.recvall(theClient)
@@ -114,9 +124,23 @@ class HTTPClient(object):
         #build the request to send to the url
         #POST, so use urllib.urlencode() here!
 
+        #host needs to be plainer! like www.tutorialspoint.com ONLY
+
+        newURL = self.plainifyURL(url)
+
+        header=''
+        header += 'POST ' + url + ' HTTP/1.1\r\n'
+        header +='\r\n'
+        
         #do this when youre ready
-        #clientSocket.sendall(header)
-        #self.recvall(clientSocket)
+        print 'connecting...'
+        theClient = self.connect(newURL, 80) #hardcoded for now? Does it change?
+
+        print 'Connected. sending header'
+        theClient.sendall(header)
+        print 'Sent header. Getting response...'
+        response = self.recvall(theClient)
+        print 'Got response'
 
         code = 500
         body = ""
