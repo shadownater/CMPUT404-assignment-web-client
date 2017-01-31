@@ -45,7 +45,7 @@ class HTTPClient(object):
         print 'made a socket...'
         # AF_INET means we want an IPv4 socket
         # SOCK_STREAM means we want a TCP socket
-        port = 80 #for now? Note to self, 8080 is not TCP
+        port = int(port)
         clientSocket.connect( (host, port) ) #address, port
         print 'connected, returning connection...'
         return clientSocket
@@ -75,20 +75,44 @@ class HTTPClient(object):
         return str(buffer)
 
 #---End of processing response section --------------------------------------------------------------------------------
+    def getPort(self, url):
+        #gets the port number from the url if a : was found (besides http://)
+        print 'Before: ' +url
+        myPort = url.split(':')
+        print myPort[1]
+        finalP = myPort[1].split('/')
+        print 'Final port value: ' + finalP[0]
+        return finalP[0]
 
     def plainifyURL(self, url):
         #remove all the junk after a slash, return the main url
         #may not work if no http:// - possible?
+        #looked in test, it can come in 3 parts
+        #http://HOST:PORT/path
+        
         plainURL = url.split('/')
-        print 'plain url = ' + plainURL[2]
-        return plainURL[2]
+        print 'plain url = ' + plainURL[0]
+
+        if(':' in plainURL[0]):
+            nonPURL = plainURL[0].split(':')
+            print 'Had a port, but now its ' + nonPURL[0] 
+            return nonPURL[0]
+
+        return plainURL[0]
 
 
     def GET(self, url, args=None):
         #build the request to send to the url
 
+        port = 80
+        #check if a port has been defined
+        nonHttpUrl = url.split('http://')
+        print nonHttpUrl[1]
+        if(':' in nonHttpUrl[1]):
+            port = self.getPort(nonHttpUrl[1])
+
         #host needs to be plainer! like www.tutorialspoint.com ONLY
-        newURL = self.plainifyURL(url)
+        newURL = self.plainifyURL(nonHttpUrl[1])
 
         #need the bit after the above
         toFetch = '/' #for now
@@ -106,8 +130,8 @@ class HTTPClient(object):
         header +='\r\n'
         
         #do this when youre ready
-        print 'connecting...'
-        theClient = self.connect(newURL, 80) #hardcoded for now? Does it change?
+        print 'connecting with ' + newURL + ', ' + port + '...'
+        theClient = self.connect(newURL, port) 
 
         print 'Header is: ' + header
         theClient.sendall(header)
