@@ -54,7 +54,9 @@ class HTTPClient(object):
 
     def get_code(self, data):
         print data
-        return None
+        myCode = data.split(' ')
+        print myCode[1]
+        return myCode[1]
 
     def get_headers(self,data):
         return None
@@ -166,7 +168,8 @@ class HTTPClient(object):
         response = self.recvall(theClient)
         print 'Got response'
 
-        code = 500
+        code = get_code(response)
+        print 'The code is: ' + code
         body = ""
 
         return HTTPResponse(code, body)
