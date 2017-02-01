@@ -53,16 +53,20 @@ class HTTPClient(object):
 #---Section below are for processing the response I think -------------------------------------------------------------
 
     def get_code(self, data):
-        print data
+        #print data
         myCode = data.split(' ')
         print myCode[1]
         return myCode[1]
 
     def get_headers(self,data):
-        return None
+        #where do I use this lol?
+        myHead = data.split('\r\n\r\n')
+        return myHead
 
     def get_body(self, data):
-        return None
+        myBody = data.split('\r\n\r\n')
+        #print myBody[1]
+        return myBody[1]
 
     # read everything from the socket
     def recvall(self, sock):
@@ -101,6 +105,18 @@ class HTTPClient(object):
             return nonPURL[0]
 
         return plainURL[0]
+    
+    def get_path(self, url):
+        #gets the path part of the url
+        
+        myPath = url.split('/')
+        print 'Length = ', len(myPath)
+        if(len(myPath) == 3): #this is kinda weird
+            return '/'
+        else:
+            myPath = '/' + myPath[3] #needs it after? Try your ass1 and see if it works for /deep/ or /deep
+            print 'path url = ' + myPath
+            return myPath
 
 
     def GET(self, url, args=None):
@@ -117,7 +133,9 @@ class HTTPClient(object):
         newURL = self.plainifyURL(nonHttpUrl[1])
 
         #need the bit after the above
-        toFetch = '/' #for now
+        toFetch = self.get_path(url)
+        if(toFetch == ''):
+            toFetch = '/'
 
         #Helpful information about building a request header from:
         #https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
@@ -140,9 +158,9 @@ class HTTPClient(object):
         print 'Sent header. Getting response...'
         response = self.recvall(theClient)
         print 'Got response'
-        code = 500
-        self.get_code(response)
-        body = ""
+        code = self.get_code(response)
+        code = int(code)
+        body = self.get_body(response)
 
         return HTTPResponse(code, body)
 
@@ -168,8 +186,7 @@ class HTTPClient(object):
         response = self.recvall(theClient)
         print 'Got response'
 
-        code = get_code(response)
-        print 'The code is: ' + code
+        code = 500
         body = ""
 
         return HTTPResponse(code, body)
