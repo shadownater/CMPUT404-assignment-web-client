@@ -44,12 +44,10 @@ class HTTPClient(object):
         #Ryan mentioned client lab for this part, so I used my previous lab for this
 
         clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
-        print 'made a socket...'
         # AF_INET means we want an IPv4 socket
         # SOCK_STREAM means we want a TCP socket
         port = int(port)
         clientSocket.connect( (host, port) ) #address, port
-        print 'connected, returning connection...'
         return clientSocket
 
 #---Section below are for processing the response I think -------------------------------------------------------------
@@ -57,7 +55,6 @@ class HTTPClient(object):
     def get_code(self, data):
         #print data
         myCode = data.split(' ')
-        print myCode[1]
         return myCode[1]
 
     def get_headers(self,data):
@@ -66,11 +63,8 @@ class HTTPClient(object):
         return myHead
 
     def get_body(self, data):
-        print 'Data is:'
-        print data
+        #print data
         myBody = data.split('\r\n\r\n')
-        print 'Boy is: '
-        print myBody[1]
         return myBody[1]
 
     # read everything from the socket
@@ -88,11 +82,11 @@ class HTTPClient(object):
 #---End of processing response section --------------------------------------------------------------------------------
     def getPort(self, url):
         #gets the port number from the url if a : was found (besides http://)
-        print 'Before: ' +url
+        
         myPort = url.split(':')
-        print myPort[1]
+        
         finalP = myPort[1].split('/')
-        print 'Final port value: ' + finalP[0]
+        
         return finalP[0]
 
     def plainifyURL(self, url):
@@ -102,11 +96,9 @@ class HTTPClient(object):
         #http://HOST:PORT/path
         
         plainURL = url.split('/')
-        print 'plain url = ' + plainURL[0]
 
         if(':' in plainURL[0]):
             nonPURL = plainURL[0].split(':')
-            print 'Had a port, but now its ' + nonPURL[0] 
             return nonPURL[0]
 
         return plainURL[0]
@@ -116,10 +108,7 @@ class HTTPClient(object):
         
         myPath = url.split('/', 1)
 
-        print 'myPath ='
-        print myPath
-
-        print 'Length = ', len(myPath)
+        #print 'Length = ', len(myPath)
 
         if( len(myPath) == 1):
             #no slashes detected
@@ -128,7 +117,7 @@ class HTTPClient(object):
         else:
            #1 or more slashes detected
            myPath = '/' + myPath[1] 
-           print 'path url = ' + myPath
+           
            return myPath
 
     def get_ContentLength(self, content):
@@ -142,7 +131,7 @@ class HTTPClient(object):
         port = 80
         #check if a port has been defined
         nonHttpUrl = url.split('http://')
-        print nonHttpUrl[1]
+        
         if(':' in nonHttpUrl[1]):
             port = self.getPort(nonHttpUrl[1])
 
@@ -155,8 +144,9 @@ class HTTPClient(object):
         if(toFetch == ''):
             toFetch = '/'
         
-        #Helpful information about building a request header from:
+        #Helpful information about building a request headers from:
         #https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+        #as well as https://www.tutorialspoint.com/http/http_quick_guide.htm
 
         header=''
         header += 'GET ' + toFetch + ' HTTP/1.1\r\n'
@@ -165,10 +155,8 @@ class HTTPClient(object):
         header +='\r\n'
         
         #do this when youre ready
-        print 'connecting with ' + newURL + ', ' + str(port) + '...' #adding str() may break ones with deinfed port?
         theClient = self.connect(newURL, port) 
 
-        print 'Header is: ' + header
         theClient.sendall(header)
 
         response = self.recvall(theClient)
@@ -188,7 +176,6 @@ class HTTPClient(object):
         port = 80
         #check if a port has been defined
         nonHttpUrl = url.split('http://')
-        print nonHttpUrl[1]
         if(':' in nonHttpUrl[1]):
             port = self.getPort(nonHttpUrl[1])
         
@@ -201,7 +188,11 @@ class HTTPClient(object):
         if(toFetch == ''):
             toFetch = '/'
 
-        #Credit Ryan here!
+        #Parts of this function written by Ryan Satyabrata
+        #Under Apache 2
+        #https://github.com/kobitoko/CMPUT404-assignment-web-client/blob/master/httpclient.py
+        #information about urllib also found from:
+        #https://docs.python.org/2/library/urllib.html#urllib.urlencode
         myArgs = ''
         if(args != None):
             myArgs = urllib.urlencode(args)
@@ -219,10 +210,8 @@ class HTTPClient(object):
         header += myArgs + '\r\n'
         
         #do this when youre ready
-        print 'connecting with ' + newURL + ', ' + port + '...'
         theClient = self.connect(newURL, port) 
 
-        print 'Header is: ' + header
         theClient.sendall(header)
 
         response = self.recvall(theClient)
