@@ -121,9 +121,15 @@ class HTTPClient(object):
 
         print 'Length = ', len(myPath)
 
-        myPath = '/' + myPath[1] #needs it after? Try your ass1 and see if it works for /deep/ or /deep
-        print 'path url = ' + myPath
-        return myPath
+        if( len(myPath) == 1):
+            #no slashes detected
+            myPath = '/' + myPath[0]
+            return myPath
+        else:
+           #1 or more slashes detected
+           myPath = '/' + myPath[1] 
+           print 'path url = ' + myPath
+           return myPath
 
     def get_ContentLength(self, content):
         #gets the POST's content length - already in format at this point -body?
@@ -145,9 +151,10 @@ class HTTPClient(object):
 
         #need the bit after the above
         toFetch = self.get_path(nonHttpUrl[1])
+        
         if(toFetch == ''):
             toFetch = '/'
-
+        
         #Helpful information about building a request header from:
         #https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
 
@@ -158,7 +165,7 @@ class HTTPClient(object):
         header +='\r\n'
         
         #do this when youre ready
-        print 'connecting with ' + newURL + ', ' + port + '...'
+        print 'connecting with ' + newURL + ', ' + str(port) + '...' #adding str() may break ones with deinfed port?
         theClient = self.connect(newURL, port) 
 
         print 'Header is: ' + header
