@@ -165,6 +165,8 @@ class HTTPClient(object):
         code = int(code)
         body = self.get_body(response)
         
+        print response
+
         return HTTPResponse(code, body)
 
 #--POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-
@@ -219,6 +221,8 @@ class HTTPClient(object):
         code = self.get_code(response)
         code = int(code)
         body = self.get_body(response)
+
+        print response
 
         return HTTPResponse(code, body)
 
