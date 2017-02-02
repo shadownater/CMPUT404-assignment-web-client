@@ -125,6 +125,10 @@ class HTTPClient(object):
         print 'path url = ' + myPath
         return myPath
 
+    def get_ContentLength(self, content):
+        #gets the POST's content length - already in format at this point -body?
+        return str( len(content) )
+
 
     def GET(self, url, args=None):
         #build the request to send to the url
@@ -168,6 +172,8 @@ class HTTPClient(object):
         
         return HTTPResponse(code, body)
 
+#--POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-POST-
+
     def POST(self, url, args=None):
         #build the request to send to the url
         #POST, so use urllib.urlencode() here!
@@ -184,15 +190,26 @@ class HTTPClient(object):
         newURL = self.plainifyURL(nonHttpUrl[1])
 
         #need the bit after the above
-        toFetch = self.get_path(url)
+        toFetch = self.get_path(nonHttpUrl[1])
         if(toFetch == ''):
             toFetch = '/'
+
+        #Credit Ryan here!
+        myArgs = ''
+        if(args != None):
+            myArgs = urllib.urlencode(args)
+
+        contentLength = self.get_ContentLength(myArgs)
 
         header=''
         header += 'POST ' + toFetch + ' HTTP/1.1\r\n'
         header += 'Host: ' + newURL + '\r\n'
+        header+= 'Content-Type: ' + 'application/x-www-form-urlencoded;\r\n' 
+        header += 'Content-Length: ' + contentLength + '\r\n'
         header += 'Accept: ' + '*/*\r\n'
         header +='\r\n'
+
+        header += myArgs + '\r\n'
         
         #do this when youre ready
         print 'connecting with ' + newURL + ', ' + port + '...'
